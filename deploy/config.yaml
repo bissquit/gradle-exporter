@@ -1,0 +1,30 @@
+---
+common:
+  # change two variables below according to your k8s environment
+  k8s_master_uri: k8s_master_uri
+  k8s_ca_base64: k8s_ca_base64
+
+  # token should be hidden for security reasons
+  # use variable in your ci/cd
+  k8s_token: "{{ env='K8S_TOKEN' }}"
+  k8s_namespace: monitoring
+
+  app_port: 8000
+
+  image_path:
+  # use variable below to rebuild deployment in k8s if nothing changed
+  image_version: "{{ env='BUILD_NUMBER' }}"
+
+  templates:
+    - template: .*.yaml.j2
+
+  resources:
+    requests:
+      cpu: 10m
+      memory: 10Mi
+    limits:
+      cpu: 100m
+      memory: 128Mi
+
+space:
+  app_name: gradle-exporter
