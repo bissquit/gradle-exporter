@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment # https://kubernetes.io/docs/user-guide/deployments
+metadata:
+  name: {{ app_name }}
+spec:
+  replicas: {{ replicas_count }}
+  revisionHistoryLimit: {{ revision_history_limit | default('3') }}  # https://kubernetes.io/docs/user-guide/deployments/#revision-history-limit
+  selector:
+    matchLabels:
+      app: {{ app_name }}
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        # example how to scrape metrics by default:
+        # https://github.com/prometheus/prometheus/blob/main/documentation/examples/prometheus-kubernetes.yml#L272
+        prometheus.io/scrape: 'true'  # NOTICE Quoting are mandatory
+        prometheus.io/path: '/' # Optional, "/metrics" is default
+        prometheus.io/port: '{{ app_port }}'
+      labels:
+        app: {{ app_name }}
+    spec:
+      terminationGracePeriodSeconds: {{ termination_grace_period_seconds | default('60') }} # Time before SIGTERM and SIGKILL
+      containers:
+      - name: {{ app_name }}
+        image: {{ image_path }}:{{ image_version }}
+        ports:
+          - containerPort: {{ app_port }}
+        resources: {{ resources | to_yaml }}
