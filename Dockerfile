@@ -1,5 +1,8 @@
 FROM python:3.7-slim
 
+LABEL description="Prometheus exporter for Gradle Enterprise" \
+      source="https://github.com/bissquit/gradle-exporter"
+
 # nobody user in base image
 ARG UID=65534
 
