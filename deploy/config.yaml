@@ -26,5 +26,5 @@ common:
       cpu: 100m
       memory: 128Mi
 
-space:
+env-name:
   app_name: gradle-exporter
