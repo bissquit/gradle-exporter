@@ -68,5 +68,3 @@ deactivate
 ```bash
 make start
 ```
-
-
