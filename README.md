@@ -15,7 +15,7 @@ docker run -it --rm \
   -e APP_PORT=8080 \
   -e APP_CHECK_INTERVAL=60 \
   -e LOG_LEVEL=DEBUG \
-  bissquit/gradle-exporter:latest
+  bissquit/gradle-server-exporter:latest
 ```
 
 ### Docker-compose
