@@ -27,5 +27,5 @@ common:
       memory: 128Mi
 
 env-name:
-  app_name: gradle-exporter
+  app_name: gradle-server-exporter
   url_link: http://localhost

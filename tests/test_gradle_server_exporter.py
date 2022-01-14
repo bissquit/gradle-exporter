@@ -1,6 +1,6 @@
 import pytest
 import json
-from gradle_exporter import \
+from gradle_server_exporter import \
     get_data, \
     validate_json, \
     parse_args, \
