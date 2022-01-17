@@ -11,7 +11,7 @@ common:
 
   app_port: 8000
 
-  image_path:
+  image_path: bissquit/gradle-server-exporter
   # use variable below to rebuild deployment in k8s if nothing changed
   image_version: "{{ env='BUILD_NUMBER' }}"
 
