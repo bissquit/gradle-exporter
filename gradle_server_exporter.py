@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 def parse_args():
     # You may either use command line argument or env variables
     parser = argparse.ArgumentParser(prog='gradle_server_exporter',
-                                     description='Prometheus exporter for Gradle Enterprise ')
+                                     description='Prometheus exporter for Gradle Enterprise Server ')
     parser.add_argument('-p', '--port',
                         default=os.getenv("APP_PORT", 8080),
                         type=int,

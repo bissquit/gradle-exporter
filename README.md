@@ -1,4 +1,4 @@
-# Prometheus exporter for Gradle Enterprise
+# Prometheus exporter for Gradle Enterprise Server
 
 ## Usage
 
