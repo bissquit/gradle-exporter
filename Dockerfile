@@ -1,4 +1,4 @@
-FROM python:3.7-slim
+FROM python:3.9-slim
 
 LABEL description="Prometheus exporter for Gradle Enterprise" \
       source="https://github.com/bissquit/gradle-server-exporter"
