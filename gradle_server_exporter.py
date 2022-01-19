@@ -43,7 +43,7 @@ async def get_data(url):
                     json_body = await r.json()
                 else:
                     logger.error(f'Cannot request Gradle url {url}! Response status: {status}')
-        except aiohttp.ClientConnectionError as error:
+        except aiohttp.ClientError as error:
             logger.error(f'Connection error to url {url}: {error}')
 
     return json_body
