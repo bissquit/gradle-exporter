@@ -105,5 +105,13 @@ def test_parse_args():
 
 
 def test_generate_metrics():
-    print(generate_metrics(json.loads('{}')))
-    pass
+    json_data = {
+        "pending": 0,
+        "requested": 0
+    }
+    result = generate_metrics(json_data=json_data)
+    assert result == 'gradle_ingest_queue_pending 0\ngradle_ingest_queue_requested 0\n'
+
+    json_data = json.loads('{}')
+    result = generate_metrics(json_data=json_data)
+    assert result == ''
