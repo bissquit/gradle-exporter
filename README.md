@@ -77,7 +77,7 @@ Setup environment is quite simple:
 make env
 make test
 ```
-**Note:** tox will install his own environments. You may add it as interpreter in your IDE - `./tox/py37/bin/python` 
+**Note:** tox will install his own environments. You may add it as interpreter in your IDE - `./tox/py39/bin/python`
 
 To use Python venv execute the following commands:
 ```shell script
