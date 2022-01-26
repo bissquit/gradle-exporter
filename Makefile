@@ -2,7 +2,7 @@ env:
 	pip3 install tox
 
 test:
-	tox
+	tox -v
 
 start:
 	docker-compose up -d --build
