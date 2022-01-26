@@ -1,5 +1,7 @@
 # Prometheus exporter for Gradle Enterprise Server
 
+Exporter get json metrics from Gradle Server endpoint, converts it to Prometheus format and exposes at `/metrics`.
+
 ## Usage
 
 Multiple installation scenarios are provided.
@@ -43,7 +45,7 @@ k8s-handle render -s env-name
 
 ## Help
 
-Exporter looks for the file contains url(s) to your Gradle Enterprise Servers. Each line is [well-formatted](https://validators.readthedocs.io/en/latest/#module-validators.url) url.
+Exporter looks for the file contains url(s) to your Gradle Enterprise Server(s). Each line is [well-formatted](https://validators.readthedocs.io/en/latest/#module-validators.url) url.
 You may pass options both via command line arguments or environment variables:
 
 |Command line argument|Environment variable|Description|
@@ -101,8 +103,8 @@ make start
 
 ### Fake GE server
 
-To test exporter locally without real GE servers try to run a fake GE server instead:
+To test exporter locally without real GE servers you may run a fake GE server:
 
 ```shell script
-python3 fake_ge_server.py && echo 'http://localhost:8081' > $(pwd)/urls.txt
+python3 fake_ge_server.py
 ```
