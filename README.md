@@ -2,19 +2,14 @@
 
 ## Usage
 
-Multiple installation scenarios are provided. To test exporter locally without real GE servers try to run a fake GE server instead:
-
-```shell script
-python3 fake_ge_server.py && echo 'http://localhost:8081' > $(pwd)/urls.txt
-```
-Don't forget to clone repo first!
+Multiple installation scenarios are provided.
 
 ### Docker
 
-
+Don't forget to provide a file `./urls.txt` with urls. Then run:
 
 ```shell script
-PORT=8080 ; docker run -it --rm \
+PORT=8080 ; docker run -it --rm --name gradle-server-exporter \
   -p ${PORT}:${PORT} \
   -v "$(pwd)/":"/app/" \
   -e APP_FILE_PATH=/app/urls.txt \
@@ -46,7 +41,7 @@ Render templates without deployment:
 k8s-handle render -s env-name
 ```
 
-# Help
+## Help
 
 Exporter looks for the file contains url(s) to your Gradle Enterprise Servers. Each line is [well-formatted](https://validators.readthedocs.io/en/latest/#module-validators.url) url.
 You may pass options both via command line arguments or environment variables:
@@ -98,7 +93,16 @@ To deactivate venv from current shell session run:
 deactivate
 ```
 
-## How to start
+### How to start
+
 ```bash
 make start
+```
+
+### Fake GE server
+
+To test exporter locally without real GE servers try to run a fake GE server instead:
+
+```shell script
+python3 fake_ge_server.py && echo 'http://localhost:8081' > $(pwd)/urls.txt
 ```
