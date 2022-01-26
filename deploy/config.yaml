@@ -28,4 +28,4 @@ common:
 
 env-name:
   app_name: gradle-server-exporter
-  url_link: http://localhost
+  file_path: /app/urls.txt

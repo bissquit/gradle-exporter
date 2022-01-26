@@ -2,17 +2,23 @@
 
 ## Usage
 
-Multiple installation scenarios are provided.
+Multiple installation scenarios are provided. To test exporter locally without real GE servers try to run a fake GE server instead:
+
+```shell script
+python3 fake_ge_server.py && echo 'http://localhost:8081' > $(pwd)/urls.txt
+```
+Don't forget to clone repo first!
 
 ### Docker
 
-Don't forget to pass valid url link to your Gradle Enterprise server:
+
 
 ```shell script
-docker run -it --rm \
-  -p 8080:8080 \
-  -e APP_URL_LINK=http://localhost \
-  -e APP_PORT=8080 \
+PORT=8080 ; docker run -it --rm \
+  -p ${PORT}:${PORT} \
+  -v "$(pwd)/":"/app/" \
+  -e APP_FILE_PATH=/app/urls.txt \
+  -e APP_PORT=${PORT} \
   -e APP_CHECK_INTERVAL=60 \
   -e LOG_LEVEL=DEBUG \
   bissquit/gradle-server-exporter:latest
@@ -28,7 +34,11 @@ docker-compose up -d --build
 
 ### k8s
 
-Use [k8s-handle](https://github.com/2gis/k8s-handle) to deploy exporter to k8s environment.
+Use [k8s-handle](https://github.com/2gis/k8s-handle) to deploy exporter to k8s environment:
+
+```shell script
+k8s-handle apply -s env-name
+```
 
 Render templates without deployment:
 
@@ -36,14 +46,38 @@ Render templates without deployment:
 k8s-handle render -s env-name
 ```
 
-Deploy:
+# Help
 
-```shell script
-k8s-handle apply -s env-name
+Exporter looks for the file contains url(s) to your Gradle Enterprise Servers. Each line is [well-formatted](https://validators.readthedocs.io/en/latest/#module-validators.url) url.
+You may pass options both via command line arguments or environment variables:
+
+|Command line argument|Environment variable|Description|
+| ----------- | ----------- | ----------- |
+|-h, --help|-|show help message|
+|-f, --file|`APP_FILE_PATH`|Absolute path to file. Each line is url link (default: Empty string)|
+|-p, --port|`APP_PORT`|Port to be listened (default: 8080)|
+|-t, --time|`APP_CHECK_INTERVAL`|Default time range in seconds to check metrics (default: 60)|
+|-|`LOG_LEVEL`|Log level based on Python [logging](https://docs.python.org/3/library/logging.html) module. expected values: DEBUG, INFO, WARNING, ERROR, CRITICAL (default: INFO)|
+
+Metrics example:
+
+```text
+gradle_ingest_queue_pending{url="http://localhost:8081"} 0
+gradle_ingest_queue_requested{url="http://localhost:8081"} 0
+gradle_ingest_queue_ageMins{url="http://localhost:8081"} 0
+gradle_ingest_queue_requestWaitTimeSecs{url="http://localhost:8081"} 0
+gradle_ingest_queue_incomingRate1m{url="http://localhost:8081"} 0.03221981766544038
+gradle_ingest_queue_incomingRate5m{url="http://localhost:8081"} 0.02219163413405735
+gradle_ingest_queue_incomingRate15m{url="http://localhost:8081"} 0.021373141599789678
+gradle_ingest_queue_processingRate1m{url="http://localhost:8081"} 0.03399783025186821
+gradle_ingest_queue_processingRate5m{url="http://localhost:8081"} 0.022374841163558885
+gradle_ingest_queue_processingRate15m{url="http://localhost:8081"} 0.021459615070953553
 ```
 
-## Setup environment
-Setup is quite simple
+
+## Dev environment
+
+Setup environment is quite simple:
 ```shell script
 make env
 make test
