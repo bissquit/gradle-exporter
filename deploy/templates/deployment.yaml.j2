@@ -26,8 +26,8 @@ spec:
       - name: {{ app_name }}
         image: {{ image_path }}:{{ image_version }}
         env:
-        - name: APP_URL_LINK
-          value: "{{ url_link }}"
+        - name: APP_FILE_PATH
+          value: "{{ file_path }}"
         - name: APP_PORT
           value: "{{ app_port }}"
         - name: APP_LOOP_TIME

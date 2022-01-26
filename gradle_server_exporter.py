@@ -1,10 +1,12 @@
 import os
+import sys
 import json
 import aiohttp
 from aiohttp import web
 import asyncio
 import logging
 import argparse
+import validators
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", logging.INFO), format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -14,6 +16,10 @@ def parse_args():
     # You may either use command line argument or env variables
     parser = argparse.ArgumentParser(prog='gradle_server_exporter',
                                      description='Prometheus exporter for Gradle Enterprise Server ')
+    parser.add_argument('-f', '--file',
+                        default=os.getenv("APP_FILE_PATH", ''),
+                        type=str,
+                        help='Absolute path to file. Each line is url link (default: Empty string)')
     parser.add_argument('-p', '--port',
                         default=os.getenv("APP_PORT", 8080),
                         type=int,
@@ -22,10 +28,6 @@ def parse_args():
                         default=os.getenv("APP_CHECK_INTERVAL", 60),
                         type=int,
                         help='Default time range in seconds to check metrics (default: 60)')
-    parser.add_argument('-l', '--link',
-                        default=os.getenv("APP_URL_LINK", False),
-                        type=str,
-                        help='Put source ip address into labels set (default: False)')
     return parser.parse_args()
 
 
@@ -75,10 +77,10 @@ def validate_json(json_data):
     return None
 
 
-def generate_metrics(json_data):
+def generate_metrics(json_data, url):
     metrics_str = ''
     for k, v in json_data.items():
-        metrics_str += f'gradle_ingest_queue_{k} {v}\n'
+        metrics_str += f'gradle_ingest_queue_{k}{{url="{url}"}} {v}\n'
     return metrics_str
 
 
@@ -92,9 +94,16 @@ async def cleanup_background_tasks(app):
 
 
 async def metrics_checker(app):
+    if not app['urls_list']:
+        logging.critical('Empty urls list is accepted. Nothing to check. Exiting...')
+        sys.exit(1)
+
     while True:
-        json_data = await get_data(app['args'].link)
-        app['metrics_str'] = generate_metrics(json_data=json_data)
+        app['metrics_str'] = ''
+        for url in app['urls_list']:
+            json_data = await get_data(url=url)
+            app['metrics_str'] += generate_metrics(json_data=json_data,
+                                                   url=url)
         await asyncio.sleep(app['args'].time)
 
 
@@ -106,12 +115,63 @@ async def return_metrics(request):
     return web.Response(text=request.app['metrics_str'])
 
 
+class HandleFileData:
+    def __init__(self, path):
+        self.path = path
+
+    def return_urls_list(self):
+        strs_list = self.read_file(path=self.path)
+        urls_list = self.normalize_urls_list(strs_list=strs_list)
+        return urls_list
+
+    def normalize_urls_list(self, strs_list):
+        invalid_urls_counter = 0
+        urls_list = []
+
+        for line in strs_list:
+            line_striped = line.strip()
+            if line_striped == '':
+                pass
+            # ignore line in the list if it doesn't look like a valid url
+            elif self.normalize_url(url=line_striped) is False:
+                invalid_urls_counter += 1
+            else:
+                urls_list.append(line_striped)
+
+        if invalid_urls_counter > 0:
+            logger.warning(f'{invalid_urls_counter} url(s) has been removed due to invalid format. Check file {self.path}')
+            logger.info('Read more about url format at https://validators.readthedocs.io/en/latest/#module-validators.url')
+
+        return urls_list
+
+    @staticmethod
+    def read_file(path):
+        try:
+            logger.info(f'Reading file {path}')
+            with open(path) as file:
+                # Return all lines in the file, as a list where each line is an item
+                strs_list = file.readlines()
+        except OSError as error:
+            logger.critical(f'Could not read file {path}: {error}')
+            strs_list = []
+        return strs_list
+
+    @staticmethod
+    def normalize_url(url):
+        result = True
+        if not validators.url(url):
+            logger.warning(f'String {url} is not a valid url. Skipping...')
+            result = False
+        return result
+
+
 def main():
     args = parse_args()
     app = web.Application()
     # For storing global-like variables, feel free to save them in an Application instance
     app['metrics_str'] = 'Initialization'
     app['args'] = args
+    app['urls_list'] = HandleFileData(args.file).return_urls_list()
     app.add_routes([web.get('/metrics', return_metrics)])
     # https://docs.aiohttp.org/en/stable/web_advanced.html#background-tasks
     app.on_startup.append(start_background_tasks)

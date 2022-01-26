@@ -2,12 +2,14 @@ import pytest
 import aiohttp
 import json
 import yarl
+import io
 from multidict import CIMultiDictProxy, CIMultiDict
 from gradle_server_exporter import \
     get_data, \
     validate_json, \
     parse_args, \
-    generate_metrics
+    generate_metrics, \
+    HandleFileData
 
 
 class MockResponse:
@@ -53,6 +55,18 @@ class MockResponse:
 
     async def json(self):
         return json.loads(self._text)
+
+
+# emulates incorrect directory path
+class MockOSReadFile:
+    def __init__(self, path):
+        self.path = path
+
+    def __enter__(self):
+        pass
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        raise OSError
 
 
 @pytest.mark.asyncio
@@ -105,13 +119,94 @@ def test_parse_args():
 
 
 def test_generate_metrics():
+    fake_url_str = 'http://fake.url'
     json_data = {
         "pending": 0,
         "requested": 0
     }
-    result = generate_metrics(json_data=json_data)
-    assert result == 'gradle_ingest_queue_pending 0\ngradle_ingest_queue_requested 0\n'
+    result = generate_metrics(json_data=json_data,
+                              url=fake_url_str)
+    assert result == f'gradle_ingest_queue_pending{{url="{fake_url_str}"}} 0\ngradle_ingest_queue_requested{{url="{fake_url_str}"}} 0\n'
 
     json_data = json.loads('{}')
-    result = generate_metrics(json_data=json_data)
+    result = generate_metrics(json_data=json_data,
+                              url=fake_url_str)
     assert result == ''
+
+
+def test_normalize_url():
+    invalid_urls_list = [
+        'http:/google.com',
+        'httpa://google.com',
+        'htt:/google.com',
+        'http//google.com',
+        'ttp://google.com',
+        'http://google',
+        'http://google.com:44a',
+        'google.com'
+    ]
+
+    for url in invalid_urls_list:
+        result = HandleFileData('').normalize_url(url=url)
+        assert result is False
+
+    valid_urls_list = [
+        'http://google.com',
+        'https://google.com',
+        'http://google.com:443',
+        'http://google.com/path',
+        'http://google.com:443/path?'
+    ]
+
+    for url in valid_urls_list:
+        result = HandleFileData('').normalize_url(url=url)
+        assert result is True
+
+
+@pytest.mark.asyncio
+def test_read_file(mocker):
+    fake_path_str = '/fake/path'
+
+    file_data_str = 'http://google.ru \nhttps://ya.ru\n'
+    # creates file-like obj in memory with appropriate methods like read() and write()
+    file = io.StringIO(file_data_str)
+    mocker.patch("builtins.open", return_value=file)
+    client = HandleFileData('').read_file(fake_path_str)
+    assert client == ['http://google.ru \n', 'https://ya.ru\n']
+
+    file_data_str = '\n\n'
+    file = io.StringIO(file_data_str)
+    mocker.patch("builtins.open", return_value=file)
+    client = HandleFileData('').read_file(fake_path_str)
+    assert client == ['\n', '\n']
+
+    file_data_str = ''
+    file = io.StringIO(file_data_str)
+    mocker.patch("builtins.open", return_value=file)
+    client = HandleFileData('').read_file(fake_path_str)
+    assert client == []
+
+    resp = MockOSReadFile(fake_path_str)
+    mocker.patch("builtins.open", return_value=resp)
+    client = HandleFileData('').read_file(fake_path_str)
+    assert client == []
+
+
+def test_normalize_urls_list():
+    file_data_str = [
+        'htt://google.ru \n',
+        'https://ya.ru\n',
+        '\n',
+        ' \n',
+        '  \n',
+        '\n ',
+        '\n  ',
+        '\n\n',
+        '\n\n ',
+        '\n\n  ',
+        '   ',
+        'google.ru',
+        '  http://site.tld '
+    ]
+    result = HandleFileData('').normalize_urls_list(strs_list=file_data_str)
+    assert result == ['https://ya.ru', 'http://site.tld']
