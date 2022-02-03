@@ -1,2 +1,5 @@
 [report]
-omit = .tox/*,tests/*
+omit = .tox/*,
+       tests/*,
+       gradle_server_exporter.py,
+       fake_ge_server.py

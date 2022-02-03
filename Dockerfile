@@ -1,12 +1,15 @@
 FROM python:3.9-slim
 
-LABEL description="Prometheus exporter for Gradle Enterprise" \
+LABEL description="Prometheus exporter for Gradle Enterprise Server" \
       source="https://github.com/bissquit/gradle-server-exporter"
 
 # nobody user in base image
 ARG UID=65534
 
-COPY --chown=$UID:$UID gradle_server_exporter.py requirements.txt /app/
+COPY --chown=$UID:$UID gradle_server_exporter.py \
+                       handler.py \
+                       requirements.txt \
+                       /app/
 
 WORKDIR /app
 

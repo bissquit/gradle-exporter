@@ -4,10 +4,9 @@ import json
 import yarl
 import io
 from multidict import CIMultiDictProxy, CIMultiDict
-from gradle_server_exporter import \
+from handler import \
     get_data, \
     validate_json, \
-    parse_args, \
     generate_metrics, \
     HandleFileData
 
@@ -111,11 +110,6 @@ def test_validate_json():
     # client = GradleWebClient()
     result = validate_json('{}')
     assert result is None
-
-
-def test_parse_args():
-    print(parse_args())
-    pass
 
 
 def test_generate_metrics():
