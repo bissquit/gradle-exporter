@@ -1,4 +1,5 @@
 import os
+import re
 import json
 import aiohttp
 import validators
@@ -55,9 +56,16 @@ def validate_json(json_data):
 
 
 def generate_metrics(json_data, url):
+    # get 'last-item' from 'https://domain.tld/path/last-item' string
+    last_item = url.rsplit('/', 1)[-1]
+    # replace '-' with '_'
+    last_item = last_item.replace('-', '_')
+
     metrics_str = ''
     for k, v in json_data.items():
-        metrics_str += f'gradle_ingest_queue_{k}{{url="{url}"}} {v}\n'
+        # convert bool values into 0/1 representation to put into metric value
+        v = 1 if re.search('true', str(v), re.IGNORECASE) else 0
+        metrics_str += f'gradle_{last_item}_{k}{{url="{url}"}} {v}\n'
     return metrics_str
 
 

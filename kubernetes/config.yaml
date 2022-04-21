@@ -11,21 +11,15 @@ common:
 
   app_port: 8000
 
-  image_path: bissquit/gradle-server-exporter
-  # use variable below to rebuild deployment in k8s if nothing changed
-  image_version: "{{ env='BUILD_NUMBER' }}"
+  image_path: 'bissquit/gradle-server-exporter'
+  image_version: 'v1.5@sha256:42deda07f8352811cbe76f391891061fe7d8f7b8983b92ac25e506d581a6b845'
 
   templates:
     - template: .*.yaml.j2
 
-  resources:
-    requests:
-      cpu: 10m
-      memory: 10Mi
-    limits:
-      cpu: 100m
-      memory: 128Mi
-
 env-name:
   app_name: gradle-server-exporter
-  file_path: /app/urls.txt
+  file_path: "/app/config/urls.txt"
+  urls:
+    - url: https://first-url.domain.tld/info/ingest-queue
+    - url: https://first-url.domain.tld/ready

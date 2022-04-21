@@ -1,0 +1,19 @@
+groups:
+- name: gradle-server-exporter
+  rules:
+  - alert: GradlePendingRequests
+    expr: gradle_ingest_queue_pending > 1000
+    for: 10m
+    labels:
+      severity: warning
+    annotations:
+      summary: More than 1000 ({{$value}}) pending requests in the queue
+
+  - alert: GradleComponentReady
+    expr: count({__name__=~"gradle_ready_.*"} == 0) by(url)
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "{{$value}}% component(s) of Gradle server is(are) not in ready state"
+      runbook: Check {{$labels.url}} for more details
