@@ -113,7 +113,7 @@ def test_validate_json():
 
 
 def test_generate_metrics():
-    fake_url_str = 'http://fake.url'
+    fake_url_str = 'http://fake.url/ingest-queue'
     json_data = {
         "pending": 0,
         "requested": 0
