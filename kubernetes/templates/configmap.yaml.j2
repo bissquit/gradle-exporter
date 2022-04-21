@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gradle-server-exporter-urls
+data:
+  urls.txt: |-
+    {% for item in urls -%}
+    {{ item.url }}
+    {% endfor -%}

@@ -1,6 +1,6 @@
 # Prometheus exporter for Gradle Enterprise Server
 
-Exporter get json metrics from Gradle Server endpoint, converts it to Prometheus format and exposes at `/metrics`.
+Exporter gets json metrics from Gradle Server endpoint, converts it to Prometheus format and exposes at `/metrics`.
 
 ## Usage
 
@@ -33,6 +33,9 @@ docker-compose up -d --build
 
 Use [k8s-handle](https://github.com/2gis/k8s-handle) to deploy exporter to k8s environment:
 
+```shell script
+cd kubernetes
+```
 ```shell script
 k8s-handle apply -s env-name
 ```

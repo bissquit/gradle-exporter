@@ -3,13 +3,9 @@ kind: Deployment # https://kubernetes.io/docs/user-guide/deployments
 metadata:
   name: {{ app_name }}
 spec:
-  replicas: {{ replicas_count }}
-  revisionHistoryLimit: {{ revision_history_limit | default('3') }}  # https://kubernetes.io/docs/user-guide/deployments/#revision-history-limit
   selector:
     matchLabels:
       app: {{ app_name }}
-  strategy:
-    type: Recreate
   template:
     metadata:
       annotations:
@@ -21,7 +17,6 @@ spec:
       labels:
         app: {{ app_name }}
     spec:
-      terminationGracePeriodSeconds: {{ termination_grace_period_seconds | default('60') }} # Time before SIGTERM and SIGKILL
       containers:
       - name: {{ app_name }}
         image: {{ image_path }}:{{ image_version }}
@@ -36,4 +31,17 @@ spec:
           value: "INFO"
         ports:
           - containerPort: {{ app_port }}
-        resources: {{ resources | to_yaml }}
+        resources:
+          requests:
+            cpu: 10m
+            memory: 64Mi
+          limits:
+            cpu: 20m
+            memory: 128Mi
+        volumeMounts:
+          - name: cfg
+            mountPath: /app/config/
+      volumes:
+        - name: cfg
+          configMap:
+            name: gradle-server-exporter-urls

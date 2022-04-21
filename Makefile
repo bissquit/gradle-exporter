@@ -1,5 +1,6 @@
 env:
-	pip3 install tox
+	pip3 install tox k8s-handle
+	pip3 uninstall -y markupsafe && pip install markupsafe==2.0.1
 
 test:
 	tox -v
