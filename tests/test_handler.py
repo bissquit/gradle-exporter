@@ -120,7 +120,7 @@ def test_generate_metrics():
     }
     result = generate_metrics(json_data=json_data,
                               url=fake_url_str)
-    assert result == f'gradle_ingest_queue_pending{{url="{fake_url_str}"}} 0\ngradle_ingest_queue_requested{{url="{fake_url_str}"}} 0\n'
+    assert result == f'gradle_ingest_queue{{entity="pending",url="{fake_url_str}"}} 0\ngradle_ingest_queue{{entity="requested",url="{fake_url_str}"}} 0\n'
 
     json_data = json.loads('{}')
     result = generate_metrics(json_data=json_data,

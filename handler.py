@@ -65,7 +65,7 @@ def generate_metrics(json_data, url):
     for k, v in json_data.items():
         # convert bool values into 0/1 representation to put into metric value
         v = 1 if re.search('true', str(v), re.IGNORECASE) else 0
-        metrics_str += f'gradle_{last_item}_{k}{{url="{url}"}} {v}\n'
+        metrics_str += f'gradle_{last_item}{{entity="{k}",url="{url}"}} {v}\n'
     return metrics_str
 
 

@@ -62,16 +62,20 @@ You may pass options both via command line arguments or environment variables:
 Metrics example:
 
 ```text
-gradle_ingest_queue_pending{url="http://localhost:8081"} 0
-gradle_ingest_queue_requested{url="http://localhost:8081"} 0
-gradle_ingest_queue_ageMins{url="http://localhost:8081"} 0
-gradle_ingest_queue_requestWaitTimeSecs{url="http://localhost:8081"} 0
-gradle_ingest_queue_incomingRate1m{url="http://localhost:8081"} 0.03221981766544038
-gradle_ingest_queue_incomingRate5m{url="http://localhost:8081"} 0.02219163413405735
-gradle_ingest_queue_incomingRate15m{url="http://localhost:8081"} 0.021373141599789678
-gradle_ingest_queue_processingRate1m{url="http://localhost:8081"} 0.03399783025186821
-gradle_ingest_queue_processingRate5m{url="http://localhost:8081"} 0.022374841163558885
-gradle_ingest_queue_processingRate15m{url="http://localhost:8081"} 0.021459615070953553
+gradle_ingest_queue{entity="pending",url="http://localhost:8081/info/ingest-queue"} 0
+gradle_ingest_queue{entity="requested",url="http://localhost:8081/info/ingest-queue"} 0
+gradle_ingest_queue{entity="ageMins",url="http://localhost:8081/info/ingest-queue"} 0
+gradle_ingest_queue{entity="requestWaitTimeSecs",url="http://localhost:8081/info/ingest-queue"} 0
+gradle_ingest_queue{entity="incomingRate1m",url="http://localhost:8081/info/ingest-queue"} 0
+gradle_ingest_queue{entity="incomingRate5m",url="http://localhost:8081/info/ingest-queue"} 0
+gradle_ingest_queue{entity="incomingRate15m",url="http://localhost:8081/info/ingest-queue"} 0
+gradle_ingest_queue{entity="processingRate1m",url="http://localhost:8081/info/ingest-queue"} 0
+gradle_ingest_queue{entity="processingRate5m",url="http://localhost:8081/info/ingest-queue"} 0
+gradle_ingest_queue{entity="processingRate15m",url="http://localhost:8081/info/ingest-queue"} 0
+gradle_ready{entity="build_cache_node",url="http://localhost:8081/ready"} 1
+gradle_ready{entity="test_distribution",url="http://localhost:8081/ready"} 1
+gradle_ready{entity="enterprise_app",url="http://localhost:8081/ready"} 1
+gradle_ready{entity="keycloak",url="http://localhost:8081/ready"} 1
 ```
 
 
