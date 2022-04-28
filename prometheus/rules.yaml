@@ -2,7 +2,7 @@ groups:
 - name: gradle-server-exporter
   rules:
   - alert: GradlePendingRequests
-    expr: gradle_ingest_queue{entity="pending} > 1000
+    expr: gradle_ingest_queue{entity="pending"} > 1000
     for: 10m
     labels:
       severity: warning
